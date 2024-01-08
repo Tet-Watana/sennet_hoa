@@ -1,0 +1,15 @@
+__pycache__/
+.vscode
+PIDNet/.vscode/
+PIDNet/data/
+PIDNet/figs/
+PIDNet/log/
+PIDNet/output/
+PIDNet/pretrained_models/
+PIDNet/samples/
+PIDNet/val_results/
+blood-vessel-segmentation/
+Understanding_of_this_competition.md
+submission/
+ViT-Adapter/
+log/
