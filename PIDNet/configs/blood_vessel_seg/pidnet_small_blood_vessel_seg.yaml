@@ -5,7 +5,6 @@ CUDNN:
 GPUS: (0,)
 OUTPUT_DIR: 'output'
 LOG_DIR: 'log'
-WORKERS: 20
 PRINT_FREQ: 10
 
 DATASET:

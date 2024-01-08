@@ -28,9 +28,9 @@ class CreateList:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Create list file")
-    parser.add_argument("--directory", type=str, help="Label directory path",
+    parser.add_argument("--label_dir_path", type=str, help="Label directory path",
                         default="data/blood_vessel_segmentation/train")
-    parser.add_argument("--output_file", type=str, help="Output lst file path",
+    parser.add_argument("--out_lst_path", type=str, help="Output lst file path",
                         default="data/list/blood_vessel_seg/train.lst")
     parser.add_argument("--no_need_str", type=str,
                         help="String to be replaced", default="data/blood_vessel_segmentation/")

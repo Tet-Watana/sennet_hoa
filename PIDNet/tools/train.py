@@ -36,6 +36,7 @@ def parse_args():
                         # default="configs/cityscapes/pidnet_small_cityscapes.yaml",
                         type=str)
     parser.add_argument('--seed', type=int, default=304)
+    parser.add_argument('--num_workers', type=int, default=20)
     parser.add_argument('opts',
                         help="Modify config options using the command-line",
                         default=None,
@@ -98,7 +99,7 @@ def main():
         train_dataset,
         batch_size=batch_size,
         shuffle=config.TRAIN.SHUFFLE,
-        num_workers=config.WORKERS,
+        num_workers=args.num_workers,
         pin_memory=False,
         drop_last=True)
 
@@ -117,7 +118,7 @@ def main():
         test_dataset,
         batch_size=config.TEST.BATCH_SIZE_PER_GPU * len(gpus),
         shuffle=False,
-        num_workers=config.WORKERS,
+        num_workers=args.num_workers,
         pin_memory=False)
 
     # criterion
