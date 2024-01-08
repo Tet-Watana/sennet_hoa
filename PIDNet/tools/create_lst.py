@@ -3,14 +3,14 @@ import argparse
 
 
 class CreateList:
-    def __init__(self, directory, output_file, no_need_str):
-        self.directory = directory
-        self.output_file = output_file
+    def __init__(self, label_dir_path, out_lst_path, no_need_str):
+        self.label_dir_path = label_dir_path
+        self.out_lst_path = out_lst_path
         self.no_need_str = no_need_str
 
     def create_lst_file(self):
-        with open(self.output_file, "w") as file:
-            for root, dirs, files in os.walk(self.directory):
+        with open(self.out_lst_path, "w") as file:
+            for root, dirs, files in os.walk(self.label_dir_path):
                 if "images" not in root:
                     continue
                 files.sort()  # Sort files in ascending order
@@ -37,5 +37,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     create_list = CreateList(
-        args.directory, args.output_file, args.no_need_str)
+        args.label_dir_path, args.out_lst_path, args.no_need_str)
     create_list.create_lst_file()
