@@ -34,8 +34,10 @@ class BaseDataset(data.Dataset):
     def __len__(self):
         return len(self.files)
 
-    def input_transform(self, image, city=True):
-        if city:
+    def input_transform(self, image, blood=True):
+        if blood:
+            image = cv2.resize(image, (self.crop_size[0], self.crop_size[1]),
+                               interpolation=cv2.INTER_LINEAR)
             image = image.astype(np.float32)[:, :, ::-1]
         else:
             image = image.astype(np.float32)

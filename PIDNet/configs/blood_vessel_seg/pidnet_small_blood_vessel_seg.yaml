@@ -10,8 +10,9 @@ PRINT_FREQ: 10
 DATASET:
   DATASET: blood_vessel_segmentation
   ROOT: data/
-  TEST_SET: 'list/blood_vessel_seg/val.lst'
   TRAIN_SET: 'list/blood_vessel_seg/train.lst'
+  VAL_SET: 'list/blood_vessel_seg/val.lst'
+  TEST_SET: 'list/blood_vessel_seg/test.lst'
   NUM_CLASSES: 2
 MODEL:
   NAME: pidnet_small
@@ -28,7 +29,6 @@ TRAIN:
   - 1512
   - 1704
   BASE_SIZE: 1704
-  BATCH_SIZE_PER_GPU: 4
   SHUFFLE: true
   BEGIN_EPOCH: 0
   END_EPOCH: 10000
@@ -42,13 +42,20 @@ TRAIN:
   MULTI_SCALE: true
   IGNORE_LABEL: 127
   SCALE_FACTOR: 16
-TEST:
+VAL:
   IMAGE_SIZE:
-  - 2048
-  - 1024
-  BASE_SIZE: 2048
-  BATCH_SIZE_PER_GPU: 6
-  FLIP_TEST: false
+  - 1512
+  - 1704
+  BASE_SIZE: 1704
+  FLIP_VAL: true
   MULTI_SCALE: false
   MODEL_FILE: ''
+  OUTPUT_INDEX: 1
+TEST:
+  IMAGE_SIZE:
+  - 1512
+  - 1704
+  BASE_SIZE: 1704
+  FLIP_TEST: false
+  MULTI_SCALE: false
   OUTPUT_INDEX: 1

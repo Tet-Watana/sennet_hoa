@@ -25,13 +25,12 @@ def parse_args():
 
     parser.add_argument('--cfg',
                         help='experiment configure file name',
-                        default="configs/cityscapes/pidnet_small_cityscapes.yaml",
+                        default="configs/blood_vessel_seg/pidnet_small_blood_vessel_seg.yaml",
                         type=str)
     parser.add_argument('opts',
                         help="Modify config options using the command-line",
                         default=None,
                         nargs=argparse.REMAINDER)
-
     args = parser.parse_args()
     update_config(config, args)
 
@@ -54,16 +53,8 @@ def main():
 
     # build model
     model = models.pidnet.get_seg_model(config, imgnet_pretrained=True)
-
-    if config.TEST.MODEL_FILE:
-        model_state_file = config.TEST.MODEL_FILE
-    else:
-        model_state_file = os.path.join(final_output_dir, 'best.pt')
-        # model_state_file = os.path.join(
-        #     "pretrained_models/cityscapes/PIDNet_S_Cityscapes_val.pt")
-
+    model_state_file = os.path.join(final_output_dir, 'best.pt')
     logger.info('=> loading model from {}'.format(model_state_file))
-
     pretrained_dict = torch.load(model_state_file)
     if 'state_dict' in pretrained_dict:
         pretrained_dict = pretrained_dict['state_dict']
@@ -75,7 +66,6 @@ def main():
             '=> loading {} from pretrained model'.format(k))
     model_dict.update(pretrained_dict)
     model.load_state_dict(model_dict)
-
     model = model.cuda()
 
     # prepare data
@@ -99,31 +89,12 @@ def main():
         num_workers=0,
         pin_memory=True)
 
-    start = timeit.default_timer()
-
-    if ('test' in config.DATASET.TEST_SET) and ('city' in config.DATASET.DATASET):
+    if ('test' in config.DATASET.TEST_SET) and ('blood' in config.DATASET.DATASET):
         test(config,
              test_dataset,
              testloader,
              model,
              sv_dir=final_output_dir)
-
-    else:
-        mean_IoU, IoU_array, pixel_acc, mean_acc = testval(config,
-                                                           test_dataset,
-                                                           testloader,
-                                                           model,
-                                                           sv_pred=True)
-
-        msg = 'MeanIU: {: 4.4f}, Pixel_Acc: {: 4.4f}, \
-            Mean_Acc: {: 4.4f}, Class IoU: '.format(mean_IoU,
-                                                    pixel_acc, mean_acc)
-        logging.info(msg)
-        logging.info(IoU_array)
-
-    end = timeit.default_timer()
-    logger.info('Mins: %d' % np.int((end-start)/60))
-    logger.info('Done')
 
 
 if __name__ == '__main__':

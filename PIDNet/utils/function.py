@@ -194,21 +194,23 @@ def test(config, test_dataset, testloader, model,
     model.eval()
     with torch.no_grad():
         for _, batch in enumerate(tqdm(testloader)):
-            image, size, name = batch
-            size = size[0]
+            image, ori_size, name = batch
+            ori_size = ori_size[0]
+            size_list = torch.tensor(image.shape).tolist()
+            size = torch.tensor([size_list[-1], size_list[-2], size_list[-3]])
             pred = test_dataset.single_scale_inference(
                 config,
                 model,
                 image.cuda())
 
-            if pred.size()[-2] != size[0] or pred.size()[-1] != size[1]:
-                pred = F.interpolate(
-                    pred, size[-2:],
-                    mode='bilinear', align_corners=config.MODEL.ALIGN_CORNERS
-                )
+            # if pred.size()[-2] != size[0] or pred.size()[-1] != size[1]:
+            #     pred = F.interpolate(
+            #         pred, size[-2:],
+            #         mode='bilinear', align_corners=config.MODEL.ALIGN_CORNERS
+            #     )
 
             if sv_pred:
                 sv_path = os.path.join(sv_dir, 'test_results')
                 if not os.path.exists(sv_path):
                     os.mkdir(sv_path)
-                test_dataset.save_pred(pred, sv_path, name)
+                test_dataset.save_pred(pred, sv_path, name, ori_size)

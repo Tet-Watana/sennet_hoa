@@ -25,9 +25,9 @@ def overlay_binary_image(color_image, binary_image):
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--color_image_dir", type=str, default="blood-vessel-segmentation/train/kidney_3_sparse/images")
+        "--color_image_dir", type=str, default="./PIDNet/data/blood_vessel_segmentation/val/kidney_2/images")
     parser.add_argument(
-        "--binary_image_dir", type=str, default="blood-vessel-segmentation/train/kidney_3_sparse/labels")
+        "--binary_image_dir", type=str, default="./PIDNet/output/blood_vessel_segmentation/pidnet_small_blood_vessel_seg/test_results/kidney_2")
     return parser.parse_args()
 
 

@@ -84,9 +84,8 @@ class BloodVesselSegmentation(BaseDataset):
     # __getitem__ is a method that is called when you use dataset[i]
     def __getitem__(self, index):
         item = self.files[index]
-        name = item["name"]
-        image = cv2.imread(os.path.join(self.root, 'blood_vessel_segmentation', item["img"]),
-                           cv2.IMREAD_UNCHANGED)
+        name = os.path.splitext(item["img"].split("/")[1] + "-" + item["img"].split("/")[-1])[0]
+        image = cv2.imread(os.path.join(self.root, 'blood_vessel_segmentation', item["img"]))
         size = image.shape
 
         if 'test' in self.list_path:
@@ -108,11 +107,18 @@ class BloodVesselSegmentation(BaseDataset):
         pred = self.inference(config, model, image)
         return pred
 
-    def save_pred(self, preds, sv_path, name):
+    def save_pred(self, preds, sv_path, name, ori_size=None):
         # This operation compresses the preds' dimension from (1, 19, 1024, 2048) to (1, 1024, 2048)
         # It acts like a nms operation which only keeps the class with the highest score
         preds = np.asarray(np.argmax(preds.cpu(), axis=1), dtype=np.uint8)
         for i in range(preds.shape[0]):
             pred = self.convert_label(preds[i], inverse=True)
             save_img = Image.fromarray(pred)
-            save_img.save(os.path.join(sv_path, name[i]+'.png'))
+            if ori_size is not None:
+                save_img = save_img.resize((ori_size[1], ori_size[0]), Image.NEAREST)
+            name_split = name[i].split('-')
+            save_dir = name_split[0]
+            save_dir_path = os.path.join(sv_path, save_dir)
+            os.makedirs(save_dir_path, exist_ok=True)
+            save_name = str(name_split[1])
+            save_img.save(os.path.join(save_dir_path, save_name+'.tif'))

@@ -48,7 +48,8 @@ _C.DATASET.DATASET = 'cityscapes'
 _C.DATASET.NUM_CLASSES = 19
 _C.DATASET.TRAIN_SET = 'list/cityscapes/train.lst'
 _C.DATASET.EXTRA_TRAIN_SET = ''
-_C.DATASET.TEST_SET = 'list/cityscapes/val.lst'
+_C.DATASET.VAL_SET = 'list/cityscapes/val.lst'
+_C.DATASET.TEST_SET = 'list/cityscapes/test.lst'
 
 # training
 _C.TRAIN = CN()
@@ -76,6 +77,16 @@ _C.TRAIN.RESUME = False
 _C.TRAIN.BATCH_SIZE_PER_GPU = 32
 _C.TRAIN.SHUFFLE = True
 
+# validating
+_C.VAL = CN()
+_C.VAL.IMAGE_SIZE = [2048, 1024]  # width * height
+_C.VAL.BASE_SIZE = 2048
+_C.VAL.BATCH_SIZE_PER_GPU = 32
+_C.VAL.MODEL_FILE = ''
+_C.VAL.FLIP_VAL = False
+_C.VAL.MULTI_SCALE = False
+_C.VAL.OUTPUT_INDEX = -1
+
 # testing
 _C.TEST = CN()
 _C.TEST.IMAGE_SIZE = [2048, 1024]  # width * height
@@ -84,13 +95,11 @@ _C.TEST.BATCH_SIZE_PER_GPU = 32
 _C.TEST.MODEL_FILE = ''
 _C.TEST.FLIP_TEST = False
 _C.TEST.MULTI_SCALE = False
-
 _C.TEST.OUTPUT_INDEX = -1
-
 
 def update_config(cfg, args):
     cfg.defrost()
-    
+
     cfg.merge_from_file(args.cfg)
     cfg.merge_from_list(args.opts)
 
@@ -101,4 +110,3 @@ if __name__ == '__main__':
     import sys
     with open(sys.argv[1], 'w') as f:
         print(_C, file=f)
-

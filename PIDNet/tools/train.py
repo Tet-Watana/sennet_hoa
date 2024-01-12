@@ -33,10 +33,10 @@ def parse_args():
     parser.add_argument('--cfg',
                         help='experiment configure file name',
                         default="configs/blood_vessel_seg/pidnet_small_blood_vessel_seg.yaml",
-                        # default="configs/cityscapes/pidnet_small_cityscapes.yaml",
                         type=str)
     parser.add_argument('--seed', type=int, default=304)
     parser.add_argument('--num_workers', type=int, default=20)
+    parser.add_argument('--batch_size', type=int, default=4)
     parser.add_argument('opts',
                         help="Modify config options using the command-line",
                         default=None,
@@ -81,7 +81,7 @@ def main():
     imgnet = 'imagenet' in config.MODEL.PRETRAINED
     model = models.pidnet.get_seg_model(config, imgnet_pretrained=imgnet)
 
-    batch_size = config.TRAIN.BATCH_SIZE_PER_GPU * len(gpus)
+    batch_size = args.batch_size * len(gpus)
     # prepare data
     crop_size = (config.TRAIN.IMAGE_SIZE[1], config.TRAIN.IMAGE_SIZE[0])
     train_dataset = eval('datasets.'+config.DATASET.DATASET)(
@@ -103,20 +103,20 @@ def main():
         pin_memory=False,
         drop_last=True)
 
-    test_size = (config.TEST.IMAGE_SIZE[1], config.TEST.IMAGE_SIZE[0])
-    test_dataset = eval('datasets.'+config.DATASET.DATASET)(
+    val_size = (config.VAL.IMAGE_SIZE[1], config.VAL.IMAGE_SIZE[0])
+    val_dataset = eval('datasets.'+config.DATASET.DATASET)(
         root=config.DATASET.ROOT,
-        list_path=config.DATASET.TEST_SET,
+        list_path=config.DATASET.VAL_SET,
         num_classes=config.DATASET.NUM_CLASSES,
         multi_scale=False,
         flip=False,
         ignore_label=config.TRAIN.IGNORE_LABEL,
-        base_size=config.TEST.BASE_SIZE,
-        crop_size=test_size)
+        base_size=config.VAL.BASE_SIZE,
+        crop_size=val_size)
 
-    testloader = torch.utils.data.DataLoader(
-        test_dataset,
-        batch_size=config.TEST.BATCH_SIZE_PER_GPU * len(gpus),
+    valloader = torch.utils.data.DataLoader(
+        val_dataset,
+        batch_size=args.batch_size * len(gpus),
         shuffle=False,
         num_workers=args.num_workers,
         pin_memory=False)
@@ -152,7 +152,7 @@ def main():
         raise ValueError('Only Support SGD optimizer')
 
     epoch_iters = int(train_dataset.__len__() /
-                      config.TRAIN.BATCH_SIZE_PER_GPU / len(gpus))
+                      args.batch_size / len(gpus))
 
     best_mIoU = 0
     last_epoch = 0
@@ -189,7 +189,7 @@ def main():
 
         if flag_rm == 1 or (epoch % 5 == 0 and epoch < real_end - 100) or (epoch >= real_end - 100):
             valid_loss, mean_IoU, IoU_array = validate(config,
-                                                       testloader, model, writer_dict)
+                                                       valloader, model, writer_dict)
         if flag_rm == 1:
             flag_rm = 0
 
