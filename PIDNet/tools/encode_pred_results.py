@@ -7,7 +7,6 @@ import _init_paths
 from utils.surface_dice_metric import score, rle_encode
 
 
-
 def parse_args():
     parser = argparse.ArgumentParser(description='Encode predicted results')
 

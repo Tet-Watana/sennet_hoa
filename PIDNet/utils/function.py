@@ -211,6 +211,5 @@ def test(config, test_dataset, testloader, model,
 
             if sv_pred:
                 sv_path = os.path.join(sv_dir, 'test_results')
-                if not os.path.exists(sv_path):
-                    os.mkdir(sv_path)
+                os.makedirs(sv_path, exist_ok=True)
                 test_dataset.save_pred(pred, sv_path, name, ori_size)
