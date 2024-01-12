@@ -52,6 +52,7 @@ VAL:
   MODEL_FILE: ''
   OUTPUT_INDEX: 1
 TEST:
+  DATA_ROOT: ''
   IMAGE_SIZE:
   - 1512
   - 1704

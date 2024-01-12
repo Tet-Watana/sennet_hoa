@@ -89,6 +89,7 @@ _C.VAL.OUTPUT_INDEX = -1
 
 # testing
 _C.TEST = CN()
+_C.TEST.DATA_ROOT = '/kaggle/input/blood-vessel-segmentation/'
 _C.TEST.IMAGE_SIZE = [2048, 1024]  # width * height
 _C.TEST.BASE_SIZE = 2048
 _C.TEST.BATCH_SIZE_PER_GPU = 32

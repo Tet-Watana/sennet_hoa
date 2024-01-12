@@ -10,6 +10,8 @@ from PIL import Image
 
 import torch
 from .base_dataset import BaseDataset
+import pandas as pd
+from utils.surface_dice_metric import rle_encode
 
 
 class BloodVesselSegmentation(BaseDataset):
@@ -36,8 +38,10 @@ class BloodVesselSegmentation(BaseDataset):
 
         self.multi_scale = multi_scale
         self.flip = flip
-
-        self.img_list = [line.strip().split() for line in open(root+list_path)]
+        if 'test' in self.list_path:
+            self.img_list = [line.strip().split() for line in open(list_path)]
+        else:
+            self.img_list = [line.strip().split() for line in open(root+list_path)]
 
         self.files = self.read_files()
 
@@ -85,7 +89,7 @@ class BloodVesselSegmentation(BaseDataset):
     def __getitem__(self, index):
         item = self.files[index]
         name = os.path.splitext(item["img"].split("/")[1] + "-" + item["img"].split("/")[-1])[0]
-        image = cv2.imread(os.path.join(self.root, 'blood_vessel_segmentation', item["img"]))
+        image = cv2.imread(os.path.join(self.root, item["img"]))
         size = image.shape
 
         if 'test' in self.list_path:
@@ -94,7 +98,7 @@ class BloodVesselSegmentation(BaseDataset):
 
             return image.copy(), np.array(size), name
 
-        label = cv2.imread(os.path.join(self.root, 'blood_vessel_segmentation', item["label"]),
+        label = cv2.imread(os.path.join(self.root, item["label"]),
                            cv2.IMREAD_GRAYSCALE)
         label = self.convert_label(label)
 
@@ -110,6 +114,7 @@ class BloodVesselSegmentation(BaseDataset):
     def save_pred(self, preds, sv_path, name, ori_size=None):
         # This operation compresses the preds' dimension from (1, 19, 1024, 2048) to (1, 1024, 2048)
         # It acts like a nms operation which only keeps the class with the highest score
+        df = pd.DataFrame(columns=['id', 'rle'])
         preds = np.asarray(np.argmax(preds.cpu(), axis=1), dtype=np.uint8)
         for i in range(preds.shape[0]):
             pred = self.convert_label(preds[i], inverse=True)
@@ -121,4 +126,10 @@ class BloodVesselSegmentation(BaseDataset):
             save_dir_path = os.path.join(sv_path, save_dir)
             os.makedirs(save_dir_path, exist_ok=True)
             save_name = str(name_split[1])
-            save_img.save(os.path.join(save_dir_path, save_name+'.tif'))
+            # save_img.save(os.path.join(save_dir_path, save_name+'.tif'))
+            img_id = save_dir + '_' + save_name
+            img = np.clip(save_img, 0, 1)
+            rle = rle_encode(img)
+            tmp_df = pd.DataFrame([[img_id, rle]], columns=['id', 'rle'])
+            df = pd.concat([df, tmp_df], ignore_index=True)
+        return df

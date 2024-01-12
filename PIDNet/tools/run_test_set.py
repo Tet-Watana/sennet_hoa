@@ -8,6 +8,7 @@ import pprint
 import logging
 import timeit
 import numpy as np
+import pandas as pd
 import torch
 import torch.nn as nn
 import torch.backends.cudnn as cudnn
@@ -32,7 +33,9 @@ def parse_args():
                         default=None,
                         nargs=argparse.REMAINDER)
     parser.add_argument('--model_path', default='output/blood_vessel_segmentation/pidnet_small_blood_vessel_seg/best.pt')
+    parser.add_argument('--test_lst_path', default='data/list/blood_vessel_seg/test.lst')
     parser.add_argument('--out_dir', default='./output/blood_vessel_segmentation/pidnet_small_blood_vessel_seg/test_results')
+    parser.add_argument('--test_data_root', default='./kaggle/input/blood-vessel-segmentation/')
     args = parser.parse_args()
     update_config(config, args)
 
@@ -64,8 +67,8 @@ def main():
     # eval('datasets.'+config.DATASET.DATASET)() is equivalent to datasets.cityscapes() class.
     # This initializes the Cityscapes class in datasets/cityscapes.py.
     test_dataset = eval('datasets.'+config.DATASET.DATASET)(
-        root=config.DATASET.ROOT,
-        list_path=config.DATASET.TEST_SET,
+        root=args.test_data_root,
+        list_path=args.test_lst_path,
         num_classes=config.DATASET.NUM_CLASSES,
         multi_scale=False,
         flip=False,
@@ -81,12 +84,12 @@ def main():
         pin_memory=True)
 
     if ('test' in config.DATASET.TEST_SET) and ('blood' in config.DATASET.DATASET):
-        test(config,
-             test_dataset,
-             testloader,
-             model,
-             sv_dir=args.out_dir)
-
+        df = test(config,
+                 test_dataset,
+                 testloader,
+                 model,
+                 sv_dir=args.out_dir)
+        df.to_csv('submission.csv', index=False)
 
 if __name__ == '__main__':
     main()

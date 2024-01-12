@@ -8,6 +8,7 @@ import time
 
 import numpy as np
 from tqdm import tqdm
+import pandas as pd
 
 import torch
 from torch.nn import functional as F
@@ -191,6 +192,7 @@ def testval(config, test_dataset, testloader, model,
 
 def test(config, test_dataset, testloader, model,
          sv_dir='./', sv_pred=True):
+    df = pd.DataFrame(columns=['id', 'rle'])
     model.eval()
     with torch.no_grad():
         for _, batch in enumerate(tqdm(testloader)):
@@ -212,4 +214,6 @@ def test(config, test_dataset, testloader, model,
             if sv_pred:
                 sv_path = os.path.join(sv_dir, 'test_results')
                 os.makedirs(sv_path, exist_ok=True)
-                test_dataset.save_pred(pred, sv_path, name, ori_size)
+                tmp_df = test_dataset.save_pred(pred, sv_path, name, ori_size)
+                df = pd.concat([df, tmp_df], ignore_index=True)
+    return df
