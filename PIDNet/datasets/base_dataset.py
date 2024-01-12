@@ -106,7 +106,7 @@ class BaseDataset(data.Dataset):
         return image, label, edge
 
     def gen_sample(self, image, label,
-                   multi_scale=True, is_flip=True, edge_pad=True, edge_size=4, city=True):
+                   multi_scale=True, is_flip=True, edge_pad=True, edge_size=4, blood=True):
 
         edge = cv2.Canny(label, 0.1, 0.2)
         kernel = np.ones((edge_size, edge_size), np.uint8)
@@ -121,7 +121,7 @@ class BaseDataset(data.Dataset):
             image, label, edge = self.multi_scale_aug(image, label, edge,
                                                       rand_scale=rand_scale)
 
-        image = self.input_transform(image, city=city)
+        image = self.input_transform(image, blood=blood)
         label = self.label_transform(label)
 
         image = image.transpose((2, 0, 1))

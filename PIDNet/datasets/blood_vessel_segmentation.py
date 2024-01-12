@@ -89,7 +89,10 @@ class BloodVesselSegmentation(BaseDataset):
     def __getitem__(self, index):
         item = self.files[index]
         name = os.path.splitext(item["img"].split("/")[1] + "-" + item["img"].split("/")[-1])[0]
-        image = cv2.imread(os.path.join(self.root, item["img"]))
+        if 'test' in item["img"]:
+            image = cv2.imread(os.path.join(self.root, item["img"]))
+        else:
+            image = cv2.imread(os.path.join(self.root, "blood_vessel_segmentation", item["img"]))
         size = image.shape
 
         if 'test' in self.list_path:
@@ -97,9 +100,12 @@ class BloodVesselSegmentation(BaseDataset):
             image = image.transpose((2, 0, 1))
 
             return image.copy(), np.array(size), name
-
-        label = cv2.imread(os.path.join(self.root, item["label"]),
-                           cv2.IMREAD_GRAYSCALE)
+        if 'test' in item["label"]:
+            label = cv2.imread(os.path.join(self.root, item["label"]),
+                                cv2.IMREAD_GRAYSCALE)
+        else:
+            label = cv2.imread(os.path.join(self.root, "blood_vessel_segmentation", item["label"]),
+                                cv2.IMREAD_GRAYSCALE) 
         label = self.convert_label(label)
 
         image, label, edge = self.gen_sample(image, label,
