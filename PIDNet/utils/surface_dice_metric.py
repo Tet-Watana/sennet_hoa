@@ -286,7 +286,7 @@ def rle_encode(img):
     runs[1::2] -= runs[::2]
     encoded_data = ' '.join(str(x) for x in runs)
     if encoded_data == '':
-        encoded_data = '1 0'
+        encoded_data = '1 1'
     return encoded_data
 
 

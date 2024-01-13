@@ -34,7 +34,7 @@ def parse_args():
                         nargs=argparse.REMAINDER)
     parser.add_argument('--model_path', default='output/blood_vessel_segmentation/pidnet_small_blood_vessel_seg/best.pt')
     parser.add_argument('--test_lst_path', default='data/list/blood_vessel_seg/test.lst')
-    parser.add_argument('--out_dir', default='./output/blood_vessel_segmentation/pidnet_small_blood_vessel_seg/test_results')
+    parser.add_argument('--out_dir', default='./output_ori/blood_vessel_segmentation/pidnet_small_blood_vessel_seg/test_results')
     parser.add_argument('--test_data_root', default='./kaggle/input/blood-vessel-segmentation/')
     args = parser.parse_args()
     update_config(config, args)
